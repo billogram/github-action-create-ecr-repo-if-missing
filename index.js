@@ -4,19 +4,6 @@ const AWS = require('aws-sdk')
 async function run () {
   try {
     const repositoryName = getInput('DOCKER_REPO_NAME', { required: true })
-/*
-    const daysBeforeExpiringUntaggedImages = getInput('NUM_DAYS_BEFORE_EXPIRING_UNTAGGED_IMAGES', { required: true })
-    const tagPrefix = getInput('TAG_PREFIX')
-    const numImages = getInput('NUM_TAGGED_IMAGES_TO_RETAIN')
-    if (tagPrefix && !numImages) {
-      setFailed('If TAG_PREFIX is provided, NUM_TAGGED_IMAGES_TO_RETAIN is required')
-      return
-    }
-    if (!tagPrefix && numImages) {
-      setFailed('If NUM_TAGGED_IMAGES_TO_RETAIN is provided, TAG_PREFIX is required')
-      return
-    }
-*/
 
     const ecr = new AWS.ECR({ apiVersion: '2015-09-21', region: process.env.AWS_REGION })
 
@@ -45,66 +32,6 @@ async function run () {
       ecr.putImageScanningConfiguration({ repositoryName, policyText: accessPolicyText }).promise(),
     ])
 
-// Disable unused configuration
-/*
-    const accessPolicyText = JSON.stringify({
-      Version: '2008-10-17',
-      Statement: [
-        {
-          Sid: 'pull',
-          Effect: 'Allow',
-          Principal: {
-            Service: 'codebuild.amazonaws.com'
-          },
-          Action: [
-            'ecr:GetDownloadUrlForLayer',
-            'ecr:BatchGetImage',
-            'ecr:BatchCheckLayerAvailability'
-          ]
-        }
-      ]
-    })
-
-    const lifecyclePolicy = {
-      rules: [
-        {
-          rulePriority: 10,
-          description: `Expire untagged images after ${daysBeforeExpiringUntaggedImages} days`,
-          selection: {
-            tagStatus: 'untagged',
-            countType: 'sinceImagePushed',
-            countUnit: 'days',
-            countNumber: parseInt(daysBeforeExpiringUntaggedImages, 10)
-          },
-          action: {
-            type: 'expire'
-          }
-        }
-      ]
-    }
-    if (tagPrefix && numImages) {
-      lifecyclePolicy.rules.push({
-        rulePriority: 20,
-        description: 'Expire old images as new ones are built',
-        selection: {
-          tagStatus: 'tagged',
-          tagPrefixList: [tagPrefix],
-          countType: 'imageCountMoreThan',
-          countNumber: parseInt(numImages, 10)
-        },
-        action: {
-          type: 'expire'
-        }
-      })
-    }
-    const lifecyclePolicyText = JSON.stringify(lifecyclePolicy)
-
-    console.log('Applying repository access and lifecycle policies...')
-    await Promise.all([
-      ecr.setRepositoryPolicy({ repositoryName, policyText: accessPolicyText }).promise(),
-      ecr.putLifecyclePolicy({ repositoryName, lifecyclePolicyText }).promise()
-    ])
-*/
     console.log('Done! 🎉')
   } catch (e) {
     setFailed(e.message || e)
