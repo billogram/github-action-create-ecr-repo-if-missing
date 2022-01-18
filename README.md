@@ -4,6 +4,9 @@
 # ![BYU logo](https://www.hscripts.com/freeimages/logos/university-logos/byu/byu-logo-clipart-128.gif) github-action-create-ecr-repo-if-missing
 A GitHub Action for creating AWS ECR repositories
 
+## Source
+ Original author: from https://github.com/byu-oit/github-action-create-ecr-repo-if-missing
+
 ## Usage
 
 ```yaml
