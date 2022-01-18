@@ -4,6 +4,7 @@ const AWS = require('aws-sdk')
 async function run () {
   try {
     const repositoryName = getInput('DOCKER_REPO_NAME', { required: true })
+/*
     const daysBeforeExpiringUntaggedImages = getInput('NUM_DAYS_BEFORE_EXPIRING_UNTAGGED_IMAGES', { required: true })
     const tagPrefix = getInput('TAG_PREFIX')
     const numImages = getInput('NUM_TAGGED_IMAGES_TO_RETAIN')
@@ -15,6 +16,7 @@ async function run () {
       setFailed('If NUM_TAGGED_IMAGES_TO_RETAIN is provided, TAG_PREFIX is required')
       return
     }
+*/
 
     const ecr = new AWS.ECR({ apiVersion: '2015-09-21', region: process.env.AWS_REGION })
 
@@ -32,6 +34,19 @@ async function run () {
     console.log('Repository does not exist. Creating...')
     await ecr.createRepository({ repositoryName, imageScanningConfiguration: { scanOnPush: true } }).promise()
 
+    console.log('Applying image scan...')
+    var imageScanConfig = {
+      imageScanningConfiguration: { /* required */
+        scanOnPush: true
+      },
+      repositoryName: repositoryName, /* required */
+    };
+    await Promise.all([
+      ecr.putImageScanningConfiguration({ repositoryName, policyText: accessPolicyText }).promise(),
+    ])
+
+// Disable unused configuration
+/*
     const accessPolicyText = JSON.stringify({
       Version: '2008-10-17',
       Statement: [
@@ -89,7 +104,7 @@ async function run () {
       ecr.setRepositoryPolicy({ repositoryName, policyText: accessPolicyText }).promise(),
       ecr.putLifecyclePolicy({ repositoryName, lifecyclePolicyText }).promise()
     ])
-
+*/
     console.log('Done! 🎉')
   } catch (e) {
     setFailed(e.message || e)
