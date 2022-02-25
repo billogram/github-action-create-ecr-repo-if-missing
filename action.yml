@@ -6,6 +6,11 @@ inputs:
     # $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/byuapi-classes-v3-app:some-tag
     description: 'The ECR repository name'
     required: true
+  AWS_ECR_PERMISSION_POLICY_JSON:
+    # Ex: 'byuapi-classes-v3-app' would allow you to tag and push images to
+    # $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/byuapi-classes-v3-app:some-tag
+    description: 'The ECR permission policy json'
+    required: true
   NUM_DAYS_BEFORE_EXPIRING_UNTAGGED_IMAGES:
     description: 'The number of days after which untagged images will expire'
     required: false
