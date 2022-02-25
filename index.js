@@ -20,24 +20,17 @@ async function run () {
     }
 
     const accessPolicyText = JSON.stringify(ecrPolicy)
+    console.log('Not Done! 🎉')
 
     console.log('Repository does not exist. Creating...')
     await ecr.createRepository({ repositoryName, imageScanningConfiguration: { scanOnPush: true } }).promise()
-    console.log('Not Done! 🎉')
 
-    console.log('Applying image scan...')
-    var imageScanConfig = {
-      imageScanningConfiguration: { /* required */
-        scanOnPush: true
-      },
-      repositoryName: repositoryName, /* required */
-    };
     await Promise.all([
       ecr.setRepositoryPolicy({ repositoryName, policyText: accessPolicyText }).promise(),
-      ecr.putImageScanningConfiguration({ repositoryName, policyText: accessPolicyText }).promise(),
     ])
 
     console.log('Done! 🎉')
+    console.log('Done2! 🎉')
   } catch (e) {
     setFailed(e.message || e)
   }
