@@ -29,7 +29,6 @@ async function run () {
       ecr.setRepositoryPolicy({ repositoryName, policyText: accessPolicyText }).promise(),
     ])
 
-    console.log('Done! 🎉')
     console.log('Done2! 🎉')
   } catch (e) {
     setFailed(e.message || e)
