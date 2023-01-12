@@ -21,17 +21,6 @@ async function run () {
     console.log('Repository does not exist. Creating...')
     await ecr.createRepository({ repositoryName, imageScanningConfiguration: { scanOnPush: true } }).promise()
 
-    console.log('Applying image scan...')
-    var imageScanConfig = {
-      imageScanningConfiguration: { /* required */
-        scanOnPush: true
-      },
-      repositoryName: repositoryName, /* required */
-    };
-    await Promise.all([
-      ecr.putImageScanningConfiguration({ repositoryName, policyText: accessPolicyText }).promise(),
-    ])
-
     console.log('Done! 🎉')
   } catch (e) {
     setFailed(e.message || e)
