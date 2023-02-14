@@ -23,7 +23,7 @@ async function run () {
             tagStatus: 'untagged',
             countType: 'sinceImagePushed',
             countUnit: 'days',
-            countNumber: 60
+            countNumber: 30
           },
           action: {
             type: 'expire'
