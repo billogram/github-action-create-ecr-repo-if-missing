@@ -14,16 +14,41 @@ async function run () {
       repositoryExists = true
     } catch {}
 
+    const lifecyclePolicy = {
+      rules: [
+        {
+          rulePriority: 10,
+          description: `Expire untagged images after 30 days`,
+          selection: {
+            tagStatus: 'untagged',
+            countType: 'sinceImagePushed',
+            countUnit: 'days',
+            countNumber: 30
+          },
+          action: {
+            type: 'expire'
+          }
+        }
+      ]
+    }
+
+    const lifecyclePolicyText = JSON.stringify(lifecyclePolicy)
+
     if (repositoryExists) {
-      console.log('Repository already exists 🎉')
+      console.log('Repository already exists, updating lifecycle only 🎉')
+      await Promise.all([
+        ecr.putLifecyclePolicy({ repositoryName, lifecyclePolicyText }).promise()
+      ])
       return
     }
 
     console.log('Repository does not exist. Creating...')
     await ecr.createRepository({ repositoryName, imageScanningConfiguration: { scanOnPush: true } }).promise()
 
+
     await Promise.all([
-      ecr.setRepositoryPolicy({ repositoryName, policyText: ecrPolicy }).promise()
+      ecr.setRepositoryPolicy({ repositoryName, policyText: ecrPolicy }).promise(),
+      ecr.putLifecyclePolicy({ repositoryName, lifecyclePolicyText }).promise()
     ])
 
     console.log('Done! 🎉')
