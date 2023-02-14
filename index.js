@@ -47,7 +47,7 @@ async function run () {
 
 
     await Promise.all([
-      ecr.setRepositoryPolicy({ repositoryName, policyText: ecrPolicy }).promise()
+      ecr.setRepositoryPolicy({ repositoryName, policyText: ecrPolicy }).promise(),
       ecr.putLifecyclePolicy({ repositoryName, lifecyclePolicyText }).promise()
     ])
 
