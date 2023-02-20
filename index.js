@@ -32,6 +32,34 @@ async function run () {
       ]
     }
 
+    lifecyclePolicy.rules.push({
+      rulePriority: 20,
+      description: 'Expire test images, keep 20 last',
+      selection: {
+        tagStatus: 'tagged',
+        tagPrefixList: ["test-"],
+        countType: 'imageCountMoreThan',
+        countNumber: 20
+      },
+      action: {
+        type: 'expire'
+      }
+    })
+
+    lifecyclePolicy.rules.push({
+      rulePriority: 30,
+      description: 'Expire unpromoted pre images, keep last 30',
+      selection: {
+        tagStatus: 'tagged',
+        tagPrefixList: ["pre-"],
+        countType: 'imageCountMoreThan',
+        countNumber: 30
+      },
+      action: {
+        type: 'expire'
+      }
+    })
+
     const lifecyclePolicyText = JSON.stringify(lifecyclePolicy)
 
     if (repositoryExists) {
