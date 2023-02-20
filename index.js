@@ -4,7 +4,6 @@ const AWS = require('aws-sdk')
 async function run () {
   try {
     const repositoryName = getInput('DOCKER_REPO_NAME', { required: true })
-    const ecrPolicy = getInput('AWS_ECR_PERMISSION_POLICY_JSON', { required: true })
 
     const ecr = new AWS.ECR({ apiVersion: '2015-09-21', region: process.env.AWS_REGION })
 
@@ -60,11 +59,61 @@ async function run () {
       }
     })
 
+   const accessPolicyText = JSON.stringify({
+      Version: '2008-10-17',
+      Statement: [
+        {
+          Sid: 'Allow Billogram-Alpha-ECR-ReadWrite',
+          Effect: 'Allow',
+          Principal: {
+            'AWS': [
+              'arn:aws:iam::995744120211:role/Billogram-Alpha-ECR-ReadWrite',
+              'arn:aws:iam::748668020123:root'
+            ]
+          },
+          Action: [
+            'ecr:BatchCheckLayerAvailability',
+            'ecr:BatchGetImage',
+            'ecr:CompleteLayerUpload',
+            'ecr:DescribeImages',
+            'ecr:DescribeRepositories',
+            'ecr:GetDownloadUrlForLayer',
+            'ecr:GetRepositoryPolicy',
+            'ecr:InitiateLayerUpload',
+            'ecr:ListImages',
+            'ecr:PutImage',
+            'ecr:SetRepositoryPolicy',
+            'ecr:UploadLayerPart'
+          ]
+        },
+        {
+          Sid: 'Allow Billogram-Alpha-ECR-Read',
+          Effect: 'Allow',
+          Principal: {
+            'AWS': [
+              'arn:aws:iam::995744120211:role/Billogram-Alpha-ECR-Read'
+            ]
+          },
+          Action: [
+            'ecr:BatchCheckLayerAvailability',
+            'ecr:BatchGetImage',
+            'ecr:DescribeImages',
+            'ecr:DescribeRepositories',
+            'ecr:GetDownloadUrlForLayer',
+            'ecr:GetRepositoryPolicy',
+            'ecr:InitiateLayerUpload',
+            'ecr:ListImages'
+          ]
+        }
+      ]
+    })
+
     const lifecyclePolicyText = JSON.stringify(lifecyclePolicy)
 
     if (repositoryExists) {
-      console.log('Repository already exists, updating lifecycle only 🎉')
+      console.log('Repository already exists 🎉')
       await Promise.all([
+        ecr.setRepositoryPolicy({ repositoryName, policyText: accessPolicyText }).promise(),
         ecr.putLifecyclePolicy({ repositoryName, lifecyclePolicyText }).promise()
       ])
       return
@@ -75,7 +124,7 @@ async function run () {
 
 
     await Promise.all([
-      ecr.setRepositoryPolicy({ repositoryName, policyText: ecrPolicy }).promise(),
+      ecr.setRepositoryPolicy({ repositoryName, policyText: accessPolicyText }).promise(),
       ecr.putLifecyclePolicy({ repositoryName, lifecyclePolicyText }).promise()
     ])
 
