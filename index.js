@@ -37,7 +37,7 @@ async function run () {
       description: 'Expire test images, keep 20 last',
       selection: {
         tagStatus: 'tagged',
-        tagPrefixList: ["test-"],
+        tagPrefixList: ["dev-"],
         countType: 'imageCountMoreThan',
         countNumber: 20
       },
